@@ -6,15 +6,16 @@
     <title>利润分解和本金计算器</title>
     <style>
         body {
-            background: linear-gradient(270deg, #464646, #28a745, #b6f0ff7a);
-            background-size: 600% 600%;
-            animation: gradientAnimation 15s ease infinite;
+            background: linear-gradient(270deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+            background-size: 400% 400%;
+            animation: gradientAnimation 12s ease infinite;
             font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
 
         @keyframes gradientAnimation {
@@ -30,12 +31,13 @@
         }
 
         .container {
-            background-color: #b6f0ff7a;
+            background-color: rgba(255, 255, 255, 0.8);
             padding: 20px;
             border-radius: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             max-width: 300px;
             width: 100%;
+            z-index: 10;
         }
 
         h1, h2 {
@@ -90,6 +92,46 @@
         .down {
             color: red;
         }
+
+        /* Bubble styling */
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: bubbleAnimation 10s linear infinite;
+        }
+
+        @keyframes bubbleAnimation {
+            from {
+                transform: translateY(0) scale(1);
+            }
+            to {
+                transform: translateY(-100vh) scale(1.2);
+            }
+        }
+
+        /* Smaller bubbles */
+        .bubble.small {
+            width: 20px;
+            height: 20px;
+            animation-duration: 6s;
+        }
+
+        /* Medium bubbles */
+        .bubble.medium {
+            width: 40px;
+            height: 40px;
+            animation-duration: 8s;
+        }
+
+        /* Large bubbles */
+        .bubble.large {
+            width: 60px;
+            height: 60px;
+            animation-duration: 12s;
+        }
     </style>
 </head>
 <body>
@@ -141,7 +183,35 @@
         </div>
     </div>
 
+    <!-- Adding bubbles to the background -->
     <script>
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+
+            // Randomly choose a size for the bubble
+            const sizes = ['small', 'medium', 'large'];
+            bubble.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
+
+            // Random starting horizontal position
+            bubble.style.left = Math.random() * 100 + 'vw';
+
+            // Add a click-to-pop interaction
+            bubble.addEventListener('click', () => {
+                bubble.style.display = 'none';
+            });
+
+            document.body.appendChild(bubble);
+
+            // Remove the bubble after the animation ends
+            setTimeout(() => {
+                bubble.remove();
+            }, 10000);
+        }
+
+        // Create bubbles at random intervals
+        setInterval(createBubble, 500);
+
         function calculate() {
             const totalProfit = parseInt(document.getElementById('totalProfit').value);
             const parts = parseInt(document.getElementById('parts').value);
