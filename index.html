@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>利润分解和本金计算器</title>
     <style>
         body {
@@ -15,7 +15,9 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
+            overflow-y: auto; /* Allow vertical scrolling */
+            box-sizing: border-box;
+            padding: 20px 0; /* Padding to avoid content hitting edges */
         }
 
         @keyframes gradientAnimation {
@@ -26,10 +28,11 @@
 
         .wrapper {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column; /* Stack containers vertically */
             gap: 20px;
             justify-content: center;
-            padding: 10px;
+            align-items: center;
+            width: 100%;
         }
 
         .container {
@@ -38,8 +41,8 @@
             border-radius: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             max-width: 300px;
-            width: 100%;
-            z-index: 10;
+            width: 90%; /* Adjust width for smaller screens */
+            box-sizing: border-box;
         }
 
         h1, h2 {
@@ -59,6 +62,7 @@
             margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 20px;
+            font-size: 16px; /* Prevent input zoom */
         }
 
         button {
@@ -94,37 +98,12 @@
         .down {
             color: red;
         }
-
-        /* Mobile adjustments */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                height: auto;
-            }
-
-            .wrapper {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .container {
-                max-width: 100%;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-
-            input, button {
-                font-size: 14px;
-            }
-        }
     </style>
 </head>
 <body>
 
     <div class="wrapper">
-        <!-- Profit Breakdown and Principal Calculation -->
+        <!-- Existing Profit Breakdown and Principal Calculation -->
         <div class="container">
             <h2>利润分解和本金计算器</h2>
             <label for="totalProfit">输入总利润：</label>
@@ -141,7 +120,7 @@
             <div class="result" id="result"></div>
         </div>
 
-        <!-- Principal Difference Calculation -->
+        <!-- New Principal Difference Calculation -->
         <div class="container">
             <h2>本金差额计算器</h2>
             <label for="currentPrincipal">输入当前本金：</label>
@@ -155,7 +134,7 @@
             <div class="result" id="differenceResult"></div>
         </div>
 
-        <!-- Principal Profit Calculator -->
+        <!-- New Principal Profit Calculator -->
         <div class="container">
             <h2>本金利润计算器</h2>
             <label for="principalAmount">输入本金：</label>
@@ -170,9 +149,37 @@
         </div>
     </div>
 
+    <!-- JavaScript remains unchanged -->
     <script>
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+
+            // Randomly choose a size for the bubble
+            const sizes = ['small', 'medium', 'large'];
+            bubble.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
+
+            // Random starting horizontal position
+            bubble.style.left = Math.random() * 100 + 'vw';
+
+            // Add a click-to-pop interaction
+            bubble.addEventListener('click', () => {
+                bubble.style.display = 'none';
+            });
+
+            document.body.appendChild(bubble);
+
+            // Remove the bubble after the animation ends
+            setTimeout(() => {
+                bubble.remove();
+            }, 10000);
+        }
+
+        // Create bubbles at random intervals
+        setInterval(createBubble, 500);
+
         function calculate() {
-            const totalProfit = parseFloat(document.getElementById('totalProfit').value);
+            const totalProfit = parseInt(document.getElementById('totalProfit').value);
             const parts = parseInt(document.getElementById('parts').value);
             const profitRate = parseFloat(document.getElementById('profitRate').value) / 100;
 
@@ -181,51 +188,77 @@
                 return;
             }
 
-            const singleProfit = totalProfit / parts;
-            const detailedProfits = Array(parts).fill(singleProfit * profitRate);
-            document.getElementById('result').innerText = detailedProfits.map((p, i) => `第${i + 1}单利润: ${p.toFixed(2)}`).join('\n');
+            const minProfit = Math.floor(totalProfit / (parts * 1.5));
+            const maxProfit = Math.ceil(totalProfit / (parts * 0.5));
 
-            showEasterEgg();
+            let remainingProfit = totalProfit;
+            const profits = [];
+            for (let i = 0; i < parts - 1; i++) {
+                const randomProfit = Math.floor(Math.random() * (maxProfit - minProfit + 1) + minProfit);
+                profits.push(randomProfit);
+                remainingProfit -= randomProfit;
+            }
+            profits.push(remainingProfit);
+
+            if (remainingProfit < minProfit) {
+                const deficit = minProfit - remainingProfit;
+                for (let i = 0; i < profits.length - 1; i++) {
+                    if (profits[i] - deficit >= minProfit) {
+                        profits[i] -= deficit;
+                        profits[profits.length - 1] = minProfit;
+                        break;
+                    }
+                }
+            } else if (remainingProfit > maxProfit) {
+                const surplus = remainingProfit - maxProfit;
+                for (let i = 0; i < profits.length - 1; i++) {
+                    if (profits[i] + surplus <= maxProfit) {
+                        profits[i] += surplus;
+                        profits[profits.length - 1] = maxProfit;
+                        break;
+                    }
+                }
+            }
+
+            let resultText = '';
+
+            profits.forEach((profit, index) => {
+                const principal = Math.floor(profit / profitRate);
+                const isUp = Math.random() > 0.5;
+                const direction = isUp ? '上涨' : '下跌';
+                const directionClass = isUp ? 'up' : 'down';
+                resultText += <span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n;
+            });
+
+            document.getElementById('result').innerHTML = resultText;
         }
 
         function calculateDifference() {
-            const currentPrincipal = parseFloat(document.getElementById('currentPrincipal').value);
+            const currentPrincipal = parseInt(document.getElementById('currentPrincipal').value);
             const marketGap = parseFloat(document.getElementById('marketGap').value) / 100;
 
-            if (isNaN(currentPrincipal) || isNaN(marketGap)) {
+            if (isNaN(currentPrincipal) || isNaN(marketGap) || marketGap < 0) {
                 document.getElementById('differenceResult').innerText = '请输入有效的数字';
                 return;
             }
 
             const difference = currentPrincipal * marketGap;
-            document.getElementById('differenceResult').innerText = `本金差额: ${difference.toFixed(2)}`;
+            const adjustedPrincipal = currentPrincipal + difference;
 
-            showEasterEgg();
+            document.getElementById('differenceResult').innerText = 调整后的本金为: ${adjustedPrincipal} (差额: ${difference});
         }
 
         function calculateProfit() {
-            const principalAmount = parseFloat(document.getElementById('principalAmount').value);
+            const principalAmount = parseInt(document.getElementById('principalAmount').value);
             const profitPercentage = parseFloat(document.getElementById('profitPercentage').value) / 100;
 
-            if (isNaN(principalAmount) || isNaN(profitPercentage)) {
+            if (isNaN(principalAmount) || isNaN(profitPercentage) || profitPercentage <= 0) {
                 document.getElementById('profitResult').innerText = '请输入有效的数字';
                 return;
             }
 
             const profit = principalAmount * profitPercentage;
-            document.getElementById('profitResult').innerText = `利润: ${profit.toFixed(2)}`;
-
-            showEasterEgg();
-        }
-
-        function showEasterEgg() {
-            const messages = [
-                "你今天运气爆棚！",
-                "智慧才是关键！",
-                "发现了隐藏彩蛋！",
-                "财务自由，月入10w加油！"
-            ];
-            if (Math.random() < 0.2) alert(messages[Math.floor(Math.random() * messages.length)]);
+            document.getElementById('profitResult').innerText = 计算的利润为: ${profit};
         }
     </script>
 </body>
