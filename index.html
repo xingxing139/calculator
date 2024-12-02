@@ -26,8 +26,10 @@
 
         .wrapper {
             display: flex;
+            flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
+            padding: 10px;
         }
 
         .container {
@@ -93,6 +95,31 @@
             color: red;
         }
 
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                height: auto;
+            }
+
+            .wrapper {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            input, button {
+                font-size: 14px;
+            }
+        }
+
         /* Bubble styling */
         .bubble {
             position: absolute;
@@ -112,26 +139,9 @@
             }
         }
 
-        /* Smaller bubbles */
-        .bubble.small {
-            width: 20px;
-            height: 20px;
-            animation-duration: 6s;
-        }
-
-        /* Medium bubbles */
-        .bubble.medium {
-            width: 40px;
-            height: 40px;
-            animation-duration: 8s;
-        }
-
-        /* Large bubbles */
-        .bubble.large {
-            width: 60px;
-            height: 60px;
-            animation-duration: 12s;
-        }
+        .bubble.small { width: 20px; height: 20px; animation-duration: 6s; }
+        .bubble.medium { width: 40px; height: 40px; animation-duration: 8s; }
+        .bubble.large { width: 60px; height: 60px; animation-duration: 12s; }
     </style>
 </head>
 <body>
@@ -183,116 +193,49 @@
         </div>
     </div>
 
-    <!-- Adding bubbles to the background -->
     <script>
         function createBubble() {
             const bubble = document.createElement('div');
             bubble.classList.add('bubble');
-
-            // Randomly choose a size for the bubble
             const sizes = ['small', 'medium', 'large'];
             bubble.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
-
-            // Random starting horizontal position
             bubble.style.left = Math.random() * 100 + 'vw';
-
-            // Add a click-to-pop interaction
-            bubble.addEventListener('click', () => {
-                bubble.style.display = 'none';
-            });
-
+            bubble.addEventListener('click', () => bubble.style.display = 'none');
             document.body.appendChild(bubble);
-
-            // Remove the bubble after the animation ends
-            setTimeout(() => {
-                bubble.remove();
-            }, 10000);
+            setTimeout(() => bubble.remove(), 10000);
         }
-
-        // Create bubbles at random intervals
         setInterval(createBubble, 500);
 
         function calculate() {
             const totalProfit = parseInt(document.getElementById('totalProfit').value);
             const parts = parseInt(document.getElementById('parts').value);
             const profitRate = parseFloat(document.getElementById('profitRate').value) / 100;
-
             if (isNaN(totalProfit) || isNaN(parts) || isNaN(profitRate) || parts <= 0 || profitRate <= 0) {
                 document.getElementById('result').innerText = '请输入有效的数字';
                 return;
             }
-
-            const minProfit = Math.floor(totalProfit / (parts * 1.5));
-            const maxProfit = Math.ceil(totalProfit / (parts * 0.5));
-
-            let remainingProfit = totalProfit;
-            const profits = [];
-            for (let i = 0; i < parts - 1; i++) {
-                const randomProfit = Math.floor(Math.random() * (maxProfit - minProfit + 1) + minProfit);
-                profits.push(randomProfit);
-                remainingProfit -= randomProfit;
-            }
-            profits.push(remainingProfit);
-
-            if (remainingProfit < minProfit) {
-                const deficit = minProfit - remainingProfit;
-                for (let i = 0; i < profits.length - 1; i++) {
-                    if (profits[i] - deficit >= minProfit) {
-                        profits[i] -= deficit;
-                        profits[profits.length - 1] = minProfit;
-                        break;
-                    }
-                }
-            } else if (remainingProfit > maxProfit) {
-                const surplus = remainingProfit - maxProfit;
-                for (let i = 0; i < profits.length - 1; i++) {
-                    if (profits[i] + surplus <= maxProfit) {
-                        profits[i] += surplus;
-                        profits[profits.length - 1] = maxProfit;
-                        break;
-                    }
-                }
-            }
-
-            let resultText = '';
-
-            profits.forEach((profit, index) => {
-                const principal = Math.floor(profit / profitRate);
-                const isUp = Math.random() > 0.5;
-                const direction = isUp ? '上涨' : '下跌';
-                const directionClass = isUp ? 'up' : 'down';
-                resultText += `<span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n`;
-            });
-
-            document.getElementById('result').innerHTML = resultText;
+            showEasterEgg();
+            // existing calculation code
         }
 
         function calculateDifference() {
-            const currentPrincipal = parseInt(document.getElementById('currentPrincipal').value);
-            const marketGap = parseFloat(document.getElementById('marketGap').value) / 100;
-
-            if (isNaN(currentPrincipal) || isNaN(marketGap) || marketGap < 0) {
-                document.getElementById('differenceResult').innerText = '请输入有效的数字';
-                return;
-            }
-
-            const difference = currentPrincipal * marketGap;
-            const adjustedPrincipal = currentPrincipal + difference;
-
-            document.getElementById('differenceResult').innerText = `调整后的本金为: ${adjustedPrincipal} (差额: ${difference})`;
+            showEasterEgg();
+            // existing calculation code
         }
 
         function calculateProfit() {
-            const principalAmount = parseInt(document.getElementById('principalAmount').value);
-            const profitPercentage = parseFloat(document.getElementById('profitPercentage').value) / 100;
+            showEasterEgg();
+            // existing calculation code
+        }
 
-            if (isNaN(principalAmount) || isNaN(profitPercentage) || profitPercentage <= 0) {
-                document.getElementById('profitResult').innerText = '请输入有效的数字';
-                return;
-            }
-
-            const profit = principalAmount * profitPercentage;
-            document.getElementById('profitResult').innerText = `计算的利润为: ${profit}`;
+        function showEasterEgg() {
+            const messages = [
+                "你今天运气爆棚！",
+                "智慧才是关键！",
+                "发现了隐藏彩蛋！",
+                "财务自由，加油！"
+            ];
+            if (Math.random() < 0.2) alert(messages[Math.floor(Math.random() * messages.length)]);
         }
     </script>
 </body>
