@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>利润分解和本金计算器</title>
     <style>
         body {
-            background: linear-gradient(270deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
-            background-size: 400% 400%;
-            animation: gradientAnimation 12s ease infinite;
+            background: radial-gradient(circle at 50% 50%, #2e3a59 10%, #091833 90%);
+            background-size: cover;
             font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
@@ -18,17 +17,13 @@
             overflow: hidden;
         }
 
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         .wrapper {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
+            max-width: 100%;
+            margin: 0 auto;
             padding: 10px;
         }
 
@@ -59,6 +54,8 @@
             margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 20px;
+            font-size: 16px; /* Consistent font size to prevent zoom */
+            touch-action: manipulation;
         }
 
         button {
@@ -87,61 +84,40 @@
             color: #333;
         }
 
-        .up {
-            color: green;
-        }
-
-        .down {
-            color: red;
-        }
-
         /* Mobile adjustments */
         @media (max-width: 768px) {
             body {
-                padding: 10px;
                 height: auto;
+                padding: 10px;
             }
 
             .wrapper {
                 flex-direction: column;
+                align-items: center;
                 gap: 10px;
             }
 
             .container {
                 max-width: 100%;
             }
-
-            h2 {
-                font-size: 20px;
-            }
-
-            input, button {
-                font-size: 14px;
-            }
         }
 
-        /* Bubble styling */
-        .bubble {
-            position: absolute;
-            bottom: -100px;
-            background: rgba(255, 255, 255, 0.3);
+        /* Explosion styling */
+        .explosion {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,0,0,0) 70%);
             border-radius: 50%;
-            opacity: 0.6;
-            animation: bubbleAnimation 10s linear infinite;
+            opacity: 0.8;
+            animation: explode 5s forwards;
+            pointer-events: none;
         }
 
-        @keyframes bubbleAnimation {
-            from {
-                transform: translateY(0) scale(1);
-            }
-            to {
-                transform: translateY(-100vh) scale(1.2);
-            }
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
         }
-
-        .bubble.small { width: 20px; height: 20px; animation-duration: 6s; }
-        .bubble.medium { width: 40px; height: 40px; animation-duration: 8s; }
-        .bubble.large { width: 60px; height: 60px; animation-duration: 12s; }
     </style>
 </head>
 <body>
@@ -194,17 +170,20 @@
     </div>
 
     <script>
-        function createBubble() {
-            const bubble = document.createElement('div');
-            bubble.classList.add('bubble');
-            const sizes = ['small', 'medium', 'large'];
-            bubble.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
-            bubble.style.left = Math.random() * 100 + 'vw';
-            bubble.addEventListener('click', () => bubble.style.display = 'none');
-            document.body.appendChild(bubble);
-            setTimeout(() => bubble.remove(), 10000);
+        // Create explosion effect on click
+        document.body.addEventListener('click', (e) => {
+            createExplosion(e.clientX, e.clientY);
+        });
+
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.classList.add('explosion');
+            explosion.style.left = `${x - 50}px`; // Center explosion on click
+            explosion.style.top = `${y - 50}px`;
+            document.body.appendChild(explosion);
+
+            setTimeout(() => explosion.remove(), 5000);  // Remove after 5 seconds
         }
-        setInterval(createBubble, 500);
 
         function calculate() {
             const totalProfit = parseInt(document.getElementById('totalProfit').value);
@@ -215,17 +194,17 @@
                 return;
             }
             showEasterEgg();
-            // existing calculation code
+            // Existing calculation code here
         }
 
         function calculateDifference() {
             showEasterEgg();
-            // existing calculation code
+            // Existing calculation code here
         }
 
         function calculateProfit() {
             showEasterEgg();
-            // existing calculation code
+            // Existing calculation code here
         }
 
         function showEasterEgg() {
