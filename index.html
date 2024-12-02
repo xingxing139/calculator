@@ -261,7 +261,7 @@
                 const isUp = Math.random() > 0.5;
                 const direction = isUp ? '上涨' : '下跌';
                 const directionClass = isUp ? 'up' : 'down';
-                resultText += <span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n;
+                resultText += `<span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n`;
             });
 
             document.getElementById('result').innerHTML = resultText;
@@ -279,7 +279,7 @@
             const difference = currentPrincipal * marketGap;
             const adjustedPrincipal = currentPrincipal + difference;
 
-            document.getElementById('differenceResult').innerText = 调整后的本金为: ${adjustedPrincipal} (差额: ${difference});
+            document.getElementById('differenceResult').innerText = `调整后的本金为: ${adjustedPrincipal} (差额: ${difference})`;
         }
 
         function calculateProfit() {
@@ -292,7 +292,7 @@
             }
 
             const profit = principalAmount * profitPercentage;
-            document.getElementById('profitResult').innerText = 计算的利润为: ${profit};
+            document.getElementById('profitResult').innerText = `计算的利润为: ${profit}`;
         }
     </script>
 </body>
