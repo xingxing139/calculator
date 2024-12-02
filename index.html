@@ -13,11 +13,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            overflow-y: auto; /* Allow vertical scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
             box-sizing: border-box;
-            padding: 20px 0; /* Padding to avoid content hitting edges */
+            padding: 20px 0;
         }
 
         @keyframes gradientAnimation {
@@ -28,7 +28,7 @@
 
         .wrapper {
             display: flex;
-            flex-direction: column; /* Stack containers vertically */
+            flex-direction: column; /* Vertical layout for mobile */
             gap: 20px;
             justify-content: center;
             align-items: center;
@@ -45,7 +45,7 @@
             box-sizing: border-box;
         }
 
-        h1, h2 {
+        h2 {
             text-align: center;
             color: #333;
         }
@@ -149,35 +149,7 @@
         </div>
     </div>
 
-    <!-- JavaScript remains unchanged -->
     <script>
-        function createBubble() {
-            const bubble = document.createElement('div');
-            bubble.classList.add('bubble');
-
-            // Randomly choose a size for the bubble
-            const sizes = ['small', 'medium', 'large'];
-            bubble.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
-
-            // Random starting horizontal position
-            bubble.style.left = Math.random() * 100 + 'vw';
-
-            // Add a click-to-pop interaction
-            bubble.addEventListener('click', () => {
-                bubble.style.display = 'none';
-            });
-
-            document.body.appendChild(bubble);
-
-            // Remove the bubble after the animation ends
-            setTimeout(() => {
-                bubble.remove();
-            }, 10000);
-        }
-
-        // Create bubbles at random intervals
-        setInterval(createBubble, 500);
-
         function calculate() {
             const totalProfit = parseInt(document.getElementById('totalProfit').value);
             const parts = parseInt(document.getElementById('parts').value);
@@ -188,77 +160,34 @@
                 return;
             }
 
-            const minProfit = Math.floor(totalProfit / (parts * 1.5));
-            const maxProfit = Math.ceil(totalProfit / (parts * 0.5));
-
-            let remainingProfit = totalProfit;
-            const profits = [];
-            for (let i = 0; i < parts - 1; i++) {
-                const randomProfit = Math.floor(Math.random() * (maxProfit - minProfit + 1) + minProfit);
-                profits.push(randomProfit);
-                remainingProfit -= randomProfit;
-            }
-            profits.push(remainingProfit);
-
-            if (remainingProfit < minProfit) {
-                const deficit = minProfit - remainingProfit;
-                for (let i = 0; i < profits.length - 1; i++) {
-                    if (profits[i] - deficit >= minProfit) {
-                        profits[i] -= deficit;
-                        profits[profits.length - 1] = minProfit;
-                        break;
-                    }
-                }
-            } else if (remainingProfit > maxProfit) {
-                const surplus = remainingProfit - maxProfit;
-                for (let i = 0; i < profits.length - 1; i++) {
-                    if (profits[i] + surplus <= maxProfit) {
-                        profits[i] += surplus;
-                        profits[profits.length - 1] = maxProfit;
-                        break;
-                    }
-                }
-            }
-
-            let resultText = '';
-
-            profits.forEach((profit, index) => {
-                const principal = Math.floor(profit / profitRate);
-                const isUp = Math.random() > 0.5;
-                const direction = isUp ? '上涨' : '下跌';
-                const directionClass = isUp ? 'up' : 'down';
-                resultText += <span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n;
-            });
-
-            document.getElementById('result').innerHTML = resultText;
+            const individualProfit = (totalProfit / parts).toFixed(2);
+            document.getElementById('result').innerText = `每单利润: ${individualProfit} \n合计本金: ${(totalProfit / profitRate).toFixed(2)}`;
         }
 
         function calculateDifference() {
             const currentPrincipal = parseInt(document.getElementById('currentPrincipal').value);
             const marketGap = parseFloat(document.getElementById('marketGap').value) / 100;
 
-            if (isNaN(currentPrincipal) || isNaN(marketGap) || marketGap < 0) {
+            if (isNaN(currentPrincipal) || isNaN(marketGap)) {
                 document.getElementById('differenceResult').innerText = '请输入有效的数字';
                 return;
             }
 
             const difference = currentPrincipal * marketGap;
-            const adjustedPrincipal = currentPrincipal + difference;
-
-            document.getElementById('differenceResult').innerText = 调整后的本金为: ${adjustedPrincipal} (差额: ${difference});
+            document.getElementById('differenceResult').innerText = `调整后的本金: ${(currentPrincipal + difference).toFixed(2)} (差额: ${difference.toFixed(2)})`;
         }
 
         function calculateProfit() {
-            const principalAmount = parseInt(document.getElementById('principalAmount').value);
+            const principalAmount = parseFloat(document.getElementById('principalAmount').value);
             const profitPercentage = parseFloat(document.getElementById('profitPercentage').value) / 100;
 
-            if (isNaN(principalAmount) || isNaN(profitPercentage) || profitPercentage <= 0) {
+            if (isNaN(principalAmount) || isNaN(profitPercentage)) {
                 document.getElementById('profitResult').innerText = '请输入有效的数字';
                 return;
             }
 
             const profit = principalAmount * profitPercentage;
-            document.getElementById('profitResult').innerText = 计算的利润为: ${profit};
+            document.getElementById('profitResult').innerText = `计算的利润: ${profit.toFixed(2)}`;
         }
     </script>
 </body>
