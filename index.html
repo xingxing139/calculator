@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>利润分解和本金计算器</title>
     <style>
         body {
@@ -13,11 +13,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            overflow-y: auto; /* Enable vertical scrolling */
-            box-sizing: border-box;
-            padding: 20px 0;
+            overflow: hidden;
         }
 
         @keyframes gradientAnimation {
@@ -28,11 +26,8 @@
 
         .wrapper {
             display: flex;
-            flex-direction: column; /* Vertical layout for mobile */
             gap: 20px;
             justify-content: center;
-            align-items: center;
-            width: 100%;
         }
 
         .container {
@@ -41,11 +36,11 @@
             border-radius: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             max-width: 300px;
-            width: 90%; /* Adjust width for smaller screens */
-            box-sizing: border-box;
+            width: 100%;
+            z-index: 10;
         }
 
-        h2 {
+        h1, h2 {
             text-align: center;
             color: #333;
         }
@@ -62,7 +57,6 @@
             margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 20px;
-            font-size: 16px; /* Prevent input zoom */
         }
 
         button {
@@ -97,6 +91,46 @@
 
         .down {
             color: red;
+        }
+
+        /* Bubble styling */
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: bubbleAnimation 10s linear infinite;
+        }
+
+        @keyframes bubbleAnimation {
+            from {
+                transform: translateY(0) scale(1);
+            }
+            to {
+                transform: translateY(-100vh) scale(1.2);
+            }
+        }
+
+        /* Smaller bubbles */
+        .bubble.small {
+            width: 20px;
+            height: 20px;
+            animation-duration: 6s;
+        }
+
+        /* Medium bubbles */
+        .bubble.medium {
+            width: 40px;
+            height: 40px;
+            animation-duration: 8s;
+        }
+
+        /* Large bubbles */
+        .bubble.large {
+            width: 60px;
+            height: 60px;
+            animation-duration: 12s;
         }
     </style>
 </head>
@@ -149,7 +183,35 @@
         </div>
     </div>
 
+    <!-- Adding bubbles to the background -->
     <script>
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+
+            // Randomly choose a size for the bubble
+            const sizes = ['small', 'medium', 'large'];
+            bubble.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
+
+            // Random starting horizontal position
+            bubble.style.left = Math.random() * 100 + 'vw';
+
+            // Add a click-to-pop interaction
+            bubble.addEventListener('click', () => {
+                bubble.style.display = 'none';
+            });
+
+            document.body.appendChild(bubble);
+
+            // Remove the bubble after the animation ends
+            setTimeout(() => {
+                bubble.remove();
+            }, 10000);
+        }
+
+        // Create bubbles at random intervals
+        setInterval(createBubble, 500);
+
         function calculate() {
             const totalProfit = parseInt(document.getElementById('totalProfit').value);
             const parts = parseInt(document.getElementById('parts').value);
@@ -160,34 +222,77 @@
                 return;
             }
 
-            const individualProfit = (totalProfit / parts).toFixed(2);
-            document.getElementById('result').innerText = `每单利润: ${individualProfit} \n合计本金: ${(totalProfit / profitRate).toFixed(2)}`;
+            const minProfit = Math.floor(totalProfit / (parts * 1.5));
+            const maxProfit = Math.ceil(totalProfit / (parts * 0.5));
+
+            let remainingProfit = totalProfit;
+            const profits = [];
+            for (let i = 0; i < parts - 1; i++) {
+                const randomProfit = Math.floor(Math.random() * (maxProfit - minProfit + 1) + minProfit);
+                profits.push(randomProfit);
+                remainingProfit -= randomProfit;
+            }
+            profits.push(remainingProfit);
+
+            if (remainingProfit < minProfit) {
+                const deficit = minProfit - remainingProfit;
+                for (let i = 0; i < profits.length - 1; i++) {
+                    if (profits[i] - deficit >= minProfit) {
+                        profits[i] -= deficit;
+                        profits[profits.length - 1] = minProfit;
+                        break;
+                    }
+                }
+            } else if (remainingProfit > maxProfit) {
+                const surplus = remainingProfit - maxProfit;
+                for (let i = 0; i < profits.length - 1; i++) {
+                    if (profits[i] + surplus <= maxProfit) {
+                        profits[i] += surplus;
+                        profits[profits.length - 1] = maxProfit;
+                        break;
+                    }
+                }
+            }
+
+            let resultText = '';
+
+            profits.forEach((profit, index) => {
+                const principal = Math.floor(profit / profitRate);
+                const isUp = Math.random() > 0.5;
+                const direction = isUp ? '上涨' : '下跌';
+                const directionClass = isUp ? 'up' : 'down';
+                resultText += <span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n;
+            });
+
+            document.getElementById('result').innerHTML = resultText;
         }
 
         function calculateDifference() {
             const currentPrincipal = parseInt(document.getElementById('currentPrincipal').value);
             const marketGap = parseFloat(document.getElementById('marketGap').value) / 100;
 
-            if (isNaN(currentPrincipal) || isNaN(marketGap)) {
+            if (isNaN(currentPrincipal) || isNaN(marketGap) || marketGap < 0) {
                 document.getElementById('differenceResult').innerText = '请输入有效的数字';
                 return;
             }
 
             const difference = currentPrincipal * marketGap;
-            document.getElementById('differenceResult').innerText = `调整后的本金: ${(currentPrincipal + difference).toFixed(2)} (差额: ${difference.toFixed(2)})`;
+            const adjustedPrincipal = currentPrincipal + difference;
+
+            document.getElementById('differenceResult').innerText = 调整后的本金为: ${adjustedPrincipal} (差额: ${difference});
         }
 
         function calculateProfit() {
-            const principalAmount = parseFloat(document.getElementById('principalAmount').value);
+            const principalAmount = parseInt(document.getElementById('principalAmount').value);
             const profitPercentage = parseFloat(document.getElementById('profitPercentage').value) / 100;
 
-            if (isNaN(principalAmount) || isNaN(profitPercentage)) {
+            if (isNaN(principalAmount) || isNaN(profitPercentage) || profitPercentage <= 0) {
                 document.getElementById('profitResult').innerText = '请输入有效的数字';
                 return;
             }
 
             const profit = principalAmount * profitPercentage;
-            document.getElementById('profitResult').innerText = `计算的利润: ${profit.toFixed(2)}`;
+            document.getElementById('profitResult').innerText = 计算的利润为: ${profit};
         }
     </script>
 </body>
