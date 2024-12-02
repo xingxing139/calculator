@@ -2,39 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>利润分解和本金计算器</title>
     <style>
         body {
-            background: radial-gradient(circle at 50% 50%, #2e3a59 10%, #091833 90%);
-            background-size: cover;
+            background: linear-gradient(270deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+            background-size: 400% 400%;
+            animation: gradientAnimation 12s ease infinite;
             font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            overflow-y: auto;  /* Allow vertical scrolling */
+            overflow: hidden;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .wrapper {
             display: flex;
-            flex-direction: column; /* Stack containers vertically */
-            align-items: center;
+            flex-wrap: wrap;
             gap: 20px;
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box; /* Include padding in width */
+            justify-content: center;
+            padding: 10px;
         }
 
         .container {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.8);
             padding: 20px;
             border-radius: 20px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
             width: 100%;
-            max-width: 350px;
-            box-sizing: border-box;
+            z-index: 10;
         }
 
         h1, h2 {
@@ -49,13 +54,11 @@
         }
 
         input {
-            width: 100%;
+            width: calc(100% - 22px);
             padding: 10px;
             margin-top: 5px;
             border: 1px solid #ddd;
             border-radius: 20px;
-            font-size: 16px;
-            box-sizing: border-box;
         }
 
         button {
@@ -84,38 +87,37 @@
             color: #333;
         }
 
+        .up {
+            color: green;
+        }
+
+        .down {
+            color: red;
+        }
+
+        /* Mobile adjustments */
         @media (max-width: 768px) {
             body {
-                height: auto;
                 padding: 10px;
+                height: auto;
             }
 
             .wrapper {
                 flex-direction: column;
-                align-items: center;
+                gap: 10px;
             }
 
             .container {
-                width: 90%;
                 max-width: 100%;
             }
-        }
 
-        /* Explosion effect */
-        .explosion {
-            position: fixed;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,0,0,0) 70%);
-            border-radius: 50%;
-            opacity: 0.8;
-            animation: explode 5s forwards;
-            pointer-events: none;
-        }
+            h2 {
+                font-size: 20px;
+            }
 
-        @keyframes explode {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(3); opacity: 0; }
+            input, button {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -126,15 +128,15 @@
         <div class="container">
             <h2>利润分解和本金计算器</h2>
             <label for="totalProfit">输入总利润：</label>
-            <input type="number" id="totalProfit" placeholder="例如：2400">
+            <input type="number" id="totalProfit" step="1" placeholder="例如：2400">
 
             <label for="parts">分解为几单：</label>
-            <input type="number" id="parts" placeholder="例如：4">
+            <input type="number" id="parts" step="1" placeholder="例如：4">
 
             <label for="profitRate">利润率（%）：</label>
-            <input type="number" id="profitRate" placeholder="例如：60">
+            <input type="number" id="profitRate" step="1" placeholder="例如：60">
 
-            <button onclick="calculate()">计算利润分解</button>
+            <button onclick="calculate()">计算/可以多次点击/选择利润</button>
 
             <div class="result" id="result"></div>
         </div>
@@ -143,10 +145,10 @@
         <div class="container">
             <h2>本金差额计算器</h2>
             <label for="currentPrincipal">输入当前本金：</label>
-            <input type="number" id="currentPrincipal" placeholder="例如：5000">
+            <input type="number" id="currentPrincipal" step="1" placeholder="例如：5000">
 
             <label for="marketGap">市场差距（%）：</label>
-            <input type="number" id="marketGap" placeholder="例如：10">
+            <input type="number" id="marketGap" step="1" placeholder="例如：10">
 
             <button onclick="calculateDifference()">计算本金差额</button>
 
@@ -157,10 +159,10 @@
         <div class="container">
             <h2>本金利润计算器</h2>
             <label for="principalAmount">输入本金：</label>
-            <input type="number" id="principalAmount" placeholder="例如：10000">
+            <input type="number" id="principalAmount" step="1" placeholder="例如：10000">
 
             <label for="profitPercentage">利润率（%）：</label>
-            <input type="number" id="profitPercentage" placeholder="例如：20">
+            <input type="number" id="profitPercentage" step="1" placeholder="例如：20">
 
             <button onclick="calculateProfit()">计算利润</button>
 
@@ -179,13 +181,11 @@
                 return;
             }
 
-            const breakdown = [];
             const singleProfit = totalProfit / parts;
-            for (let i = 1; i <= parts; i++) {
-                breakdown.push(`第${i}单利润: ${(singleProfit * profitRate).toFixed(2)}`);
-            }
+            const detailedProfits = Array(parts).fill(singleProfit * profitRate);
+            document.getElementById('result').innerText = detailedProfits.map((p, i) => `第${i + 1}单利润: ${p.toFixed(2)}`).join('\n');
 
-            document.getElementById('result').innerText = breakdown.join('\n');
+            showEasterEgg();
         }
 
         function calculateDifference() {
@@ -199,6 +199,8 @@
 
             const difference = currentPrincipal * marketGap;
             document.getElementById('differenceResult').innerText = `本金差额: ${difference.toFixed(2)}`;
+
+            showEasterEgg();
         }
 
         function calculateProfit() {
@@ -212,20 +214,18 @@
 
             const profit = principalAmount * profitPercentage;
             document.getElementById('profitResult').innerText = `利润: ${profit.toFixed(2)}`;
+
+            showEasterEgg();
         }
 
-        document.body.addEventListener('click', (e) => {
-            createExplosion(e.clientX, e.clientY);
-        });
-
-        function createExplosion(x, y) {
-            const explosion = document.createElement('div');
-            explosion.classList.add('explosion');
-            explosion.style.left = `${x - 50}px`; // Center explosion on click
-            explosion.style.top = `${y - 50}px`;
-            document.body.appendChild(explosion);
-
-            setTimeout(() => explosion.remove(), 5000);  // Remove after 5 seconds
+        function showEasterEgg() {
+            const messages = [
+                "你今天运气爆棚！",
+                "智慧才是关键！",
+                "发现了隐藏彩蛋！",
+                "财务自由，月入10w加油！"
+            ];
+            if (Math.random() < 0.2) alert(messages[Math.floor(Math.random() * messages.length)]);
         }
     </script>
 </body>
