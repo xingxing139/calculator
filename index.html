@@ -1,145 +1,298 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工具网站</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <title>利润分解和本金计算器</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background: linear-gradient(270deg, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+            background-size: 400% 400%;
+            animation: gradientAnimation 12s ease infinite;
+            font-family: 'Arial', sans-serif;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .wrapper {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
         .container {
-            max-width: 800px;
-            background: white;
+            background-color: rgba(255, 255, 255, 0.8);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            width: 100%;
+            z-index: 10;
         }
-        .tool-content {
-            display: none;
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
         }
-        .btn-group .btn {
-            margin-right: 10px;
+
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background-color: #fafafa;
+            white-space: pre-line;
+            color: #333;
+        }
+
+        .up {
+            color: green;
+        }
+
+        .down {
+            color: red;
+        }
+
+        /* Bubble styling */
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: bubbleAnimation 10s linear infinite;
+        }
+
+        @keyframes bubbleAnimation {
+            from {
+                transform: translateY(0) scale(1);
+            }
+            to {
+                transform: translateY(-100vh) scale(1.2);
+            }
+        }
+
+        /* Smaller bubbles */
+        .bubble.small {
+            width: 20px;
+            height: 20px;
+            animation-duration: 6s;
+        }
+
+        /* Medium bubbles */
+        .bubble.medium {
+            width: 40px;
+            height: 40px;
+            animation-duration: 8s;
+        }
+
+        /* Large bubbles */
+        .bubble.large {
+            width: 60px;
+            height: 60px;
+            animation-duration: 12s;
         }
     </style>
 </head>
 <body>
-    <div class="container text-center">
-        <h2 class="mb-4">工具网站</h2>
-        <div class="btn-group mb-3" role="group">
-            <button class="btn btn-primary" onclick="openTool('tool1')">利润计算器</button>
-            <button class="btn btn-primary" onclick="openTool('tool2')">工具 2</button>
-            <button class="btn btn-primary" onclick="openTool('tool3')">工具 3</button>
+
+    <div class="wrapper">
+        <!-- Existing Profit Breakdown and Principal Calculation -->
+        <div class="container">
+            <h2>利润分解和本金计算器</h2>
+            <label for="totalProfit">输入总利润：</label>
+            <input type="number" id="totalProfit" step="1" placeholder="例如：2400">
+
+            <label for="parts">分解为几单：</label>
+            <input type="number" id="parts" step="1" placeholder="例如：4">
+
+            <label for="profitRate">利润率（%）：</label>
+            <input type="number" id="profitRate" step="1" placeholder="例如：60">
+
+            <button onclick="calculate()">计算/可以多次点击/选择利润</button>
+
+            <div class="result" id="result"></div>
         </div>
-        <div id="tool1" class="tool-content p-3 border rounded bg-light">
-            <h4>利润分解和本金计算器</h4>
-            <div class="wrapper d-flex flex-wrap gap-3 justify-content-center">
-                <div class="container bg-white p-3 rounded shadow">
-                    <h5>利润分解计算器</h5>
-                    <label for="totalProfit">输入总利润：</label>
-                    <input type="number" id="totalProfit" class="form-control" placeholder="例如：2400">
-                    <label for="parts">分解为几单：</label>
-                    <input type="number" id="parts" class="form-control" placeholder="例如：4">
-                    <label for="profitRate">利润率（%）：</label>
-                    <input type="number" id="profitRate" class="form-control" placeholder="例如：60">
-                    <button class="btn btn-success mt-3" onclick="calculate()">计算</button>
-                    <div class="result mt-2" id="result"></div>
-                </div>
-                <div class="container bg-white p-3 rounded shadow">
-                    <h5>本金差额计算器</h5>
-                    <label for="currentPrincipal">输入当前本金：</label>
-                    <input type="number" id="currentPrincipal" class="form-control" placeholder="例如：5000">
-                    <label for="marketGap">市场差距（%）：</label>
-                    <input type="number" id="marketGap" class="form-control" placeholder="例如：10">
-                    <button class="btn btn-success mt-3" onclick="calculateDifference()">计算</button>
-                    <div class="result mt-2" id="differenceResult"></div>
-                </div>
-                <div class="container bg-white p-3 rounded shadow">
-                    <h5>本金利润计算器</h5>
-                    <label for="principalAmount">输入本金：</label>
-                    <input type="number" id="principalAmount" class="form-control" placeholder="例如：10000">
-                    <label for="profitPercentage">利润率（%）：</label>
-                    <input type="number" id="profitPercentage" class="form-control" placeholder="例如：20">
-                    <button class="btn btn-success mt-3" onclick="calculateProfit()">计算</button>
-                    <div class="result mt-2" id="profitResult"></div>
-                </div>
-            </div>
-            <button class="btn btn-danger mt-3" onclick="closeTool()">关闭</button>
+
+        <!-- New Principal Difference Calculation -->
+        <div class="container">
+            <h2>本金差额计算器</h2>
+            <label for="currentPrincipal">输入当前本金：</label>
+            <input type="number" id="currentPrincipal" step="1" placeholder="例如：5000">
+
+            <label for="marketGap">市场差距（%）：</label>
+            <input type="number" id="marketGap" step="1" placeholder="例如：10">
+
+            <button onclick="calculateDifference()">计算本金差额</button>
+
+            <div class="result" id="differenceResult"></div>
         </div>
-        <div id="tool2" class="tool-content p-3 border rounded bg-light">
-            <h4>工具 2</h4>
-            <p>这里是工具 2 的内容。</p>
-            <button class="btn btn-danger" onclick="closeTool()">关闭</button>
-        </div>
-        <div id="tool3" class="tool-content p-3 border rounded bg-light">
-            <h4>工具 3</h4>
-            <p>这里是工具 3 的内容。</p>
-            <button class="btn btn-danger" onclick="closeTool()">关闭</button>
+
+        <!-- New Principal Profit Calculator -->
+        <div class="container">
+            <h2>本金利润计算器</h2>
+            <label for="principalAmount">输入本金：</label>
+            <input type="number" id="principalAmount" step="1" placeholder="例如：10000">
+
+            <label for="profitPercentage">利润率（%）：</label>
+            <input type="number" id="profitPercentage" step="1" placeholder="例如：20">
+
+            <button onclick="calculateProfit()">计算利润</button>
+
+            <div class="result" id="profitResult"></div>
         </div>
     </div>
+
+    <!-- Adding bubbles to the background -->
     <script>
-        let currentTool = null;
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
 
-        function openTool(toolId) {
-            if (currentTool) {
-                document.getElementById(currentTool).style.display = 'none';
-            }
-            document.getElementById(toolId).style.display = 'block';
-            currentTool = toolId;
+            // Randomly choose a size for the bubble
+            const sizes = ['small', 'medium', 'large'];
+            bubble.classList.add(sizes[Math.floor(Math.random() * sizes.length)]);
+
+            // Random starting horizontal position
+            bubble.style.left = Math.random() * 100 + 'vw';
+
+            // Add a click-to-pop interaction
+            bubble.addEventListener('click', () => {
+                bubble.style.display = 'none';
+            });
+
+            document.body.appendChild(bubble);
+
+            // Remove the bubble after the animation ends
+            setTimeout(() => {
+                bubble.remove();
+            }, 10000);
         }
 
-        function closeTool() {
-            if (currentTool) {
-                document.getElementById(currentTool).style.display = 'none';
-                currentTool = null;
-            }
-        }
+        // Create bubbles at random intervals
+        setInterval(createBubble, 500);
 
         function calculate() {
-            let totalProfit = parseFloat(document.getElementById('totalProfit').value);
-            let parts = parseInt(document.getElementById('parts').value);
-            let profitRate = parseFloat(document.getElementById('profitRate').value) / 100;
+            const totalProfit = parseInt(document.getElementById('totalProfit').value);
+            const parts = parseInt(document.getElementById('parts').value);
+            const profitRate = parseFloat(document.getElementById('profitRate').value) / 100;
 
             if (isNaN(totalProfit) || isNaN(parts) || isNaN(profitRate) || parts <= 0 || profitRate <= 0) {
                 document.getElementById('result').innerText = '请输入有效的数字';
                 return;
             }
 
-            let profit = totalProfit * profitRate;
-            document.getElementById('result').innerText = `计算的利润: ${profit.toFixed(2)}`;
+            const minProfit = Math.floor(totalProfit / (parts * 1.5));
+            const maxProfit = Math.ceil(totalProfit / (parts * 0.5));
+
+            let remainingProfit = totalProfit;
+            const profits = [];
+            for (let i = 0; i < parts - 1; i++) {
+                const randomProfit = Math.floor(Math.random() * (maxProfit - minProfit + 1) + minProfit);
+                profits.push(randomProfit);
+                remainingProfit -= randomProfit;
+            }
+            profits.push(remainingProfit);
+
+            if (remainingProfit < minProfit) {
+                const deficit = minProfit - remainingProfit;
+                for (let i = 0; i < profits.length - 1; i++) {
+                    if (profits[i] - deficit >= minProfit) {
+                        profits[i] -= deficit;
+                        profits[profits.length - 1] = minProfit;
+                        break;
+                    }
+                }
+            } else if (remainingProfit > maxProfit) {
+                const surplus = remainingProfit - maxProfit;
+                for (let i = 0; i < profits.length - 1; i++) {
+                    if (profits[i] + surplus <= maxProfit) {
+                        profits[i] += surplus;
+                        profits[profits.length - 1] = maxProfit;
+                        break;
+                    }
+                }
+            }
+
+            let resultText = '';
+
+            profits.forEach((profit, index) => {
+                const principal = Math.floor(profit / profitRate);
+                const isUp = Math.random() > 0.5;
+                const direction = isUp ? '上涨' : '下跌';
+                const directionClass = isUp ? 'up' : 'down';
+                resultText += <span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n;
+            });
+
+            document.getElementById('result').innerHTML = resultText;
         }
 
         function calculateDifference() {
-            let currentPrincipal = parseFloat(document.getElementById('currentPrincipal').value);
-            let marketGap = parseFloat(document.getElementById('marketGap').value) / 100;
+            const currentPrincipal = parseInt(document.getElementById('currentPrincipal').value);
+            const marketGap = parseFloat(document.getElementById('marketGap').value) / 100;
 
             if (isNaN(currentPrincipal) || isNaN(marketGap) || marketGap < 0) {
                 document.getElementById('differenceResult').innerText = '请输入有效的数字';
                 return;
             }
 
-            let difference = currentPrincipal * marketGap;
-            document.getElementById('differenceResult').innerText = `本金差额: ${difference.toFixed(2)}`;
+            const difference = currentPrincipal * marketGap;
+            const adjustedPrincipal = currentPrincipal + difference;
+
+            document.getElementById('differenceResult').innerText = 调整后的本金为: ${adjustedPrincipal} (差额: ${difference});
         }
 
         function calculateProfit() {
-            let principalAmount = parseFloat(document.getElementById('principalAmount').value);
-            let profitPercentage = parseFloat(document.getElementById('profitPercentage').value) / 100;
+            const principalAmount = parseInt(document.getElementById('principalAmount').value);
+            const profitPercentage = parseFloat(document.getElementById('profitPercentage').value) / 100;
 
             if (isNaN(principalAmount) || isNaN(profitPercentage) || profitPercentage <= 0) {
                 document.getElementById('profitResult').innerText = '请输入有效的数字';
                 return;
             }
 
-            let profit = principalAmount * profitPercentage;
-            document.getElementById('profitResult').innerText = `计算的利润: ${profit.toFixed(2)}`;
+            const profit = principalAmount * profitPercentage;
+            document.getElementById('profitResult').innerText = 计算的利润为: ${profit};
         }
     </script>
 </body>
