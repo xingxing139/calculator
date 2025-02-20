@@ -234,34 +234,13 @@
             }
             profits.push(remainingProfit);
 
-            if (remainingProfit < minProfit) {
-                const deficit = minProfit - remainingProfit;
-                for (let i = 0; i < profits.length - 1; i++) {
-                    if (profits[i] - deficit >= minProfit) {
-                        profits[i] -= deficit;
-                        profits[profits.length - 1] = minProfit;
-                        break;
-                    }
-                }
-            } else if (remainingProfit > maxProfit) {
-                const surplus = remainingProfit - maxProfit;
-                for (let i = 0; i < profits.length - 1; i++) {
-                    if (profits[i] + surplus <= maxProfit) {
-                        profits[i] += surplus;
-                        profits[profits.length - 1] = maxProfit;
-                        break;
-                    }
-                }
-            }
-
             let resultText = '';
-
             profits.forEach((profit, index) => {
                 const principal = Math.floor(profit / profitRate);
                 const isUp = Math.random() > 0.5;
                 const direction = isUp ? '上涨' : '下跌';
                 const directionClass = isUp ? 'up' : 'down';
-                resultText += <span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n;
+                resultText += `<span class="${directionClass}">单 ${index + 1}: 利润 ${profit} 本金 ${principal} (${direction})</span>\n`;
             });
 
             document.getElementById('result').innerHTML = resultText;
@@ -279,7 +258,7 @@
             const difference = currentPrincipal * marketGap;
             const adjustedPrincipal = currentPrincipal + difference;
 
-            document.getElementById('differenceResult').innerText = 调整后的本金为: ${adjustedPrincipal} (差额: ${difference});
+            document.getElementById('differenceResult').innerText = `调整后的本金为: ${adjustedPrincipal} (差额: ${difference})`;
         }
 
         function calculateProfit() {
@@ -292,7 +271,7 @@
             }
 
             const profit = principalAmount * profitPercentage;
-            document.getElementById('profitResult').innerText = 计算的利润为: ${profit};
+            document.getElementById('profitResult').innerText = `计算的利润为: ${profit}`;
         }
     </script>
 </body>
