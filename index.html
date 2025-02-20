@@ -101,6 +101,46 @@
                 currentTool = null;
             }
         }
+
+        function calculate() {
+            let totalProfit = parseFloat(document.getElementById('totalProfit').value);
+            let parts = parseInt(document.getElementById('parts').value);
+            let profitRate = parseFloat(document.getElementById('profitRate').value) / 100;
+
+            if (isNaN(totalProfit) || isNaN(parts) || isNaN(profitRate) || parts <= 0 || profitRate <= 0) {
+                document.getElementById('result').innerText = '请输入有效的数字';
+                return;
+            }
+
+            let profit = totalProfit * profitRate;
+            document.getElementById('result').innerText = `计算的利润: ${profit.toFixed(2)}`;
+        }
+
+        function calculateDifference() {
+            let currentPrincipal = parseFloat(document.getElementById('currentPrincipal').value);
+            let marketGap = parseFloat(document.getElementById('marketGap').value) / 100;
+
+            if (isNaN(currentPrincipal) || isNaN(marketGap) || marketGap < 0) {
+                document.getElementById('differenceResult').innerText = '请输入有效的数字';
+                return;
+            }
+
+            let difference = currentPrincipal * marketGap;
+            document.getElementById('differenceResult').innerText = `本金差额: ${difference.toFixed(2)}`;
+        }
+
+        function calculateProfit() {
+            let principalAmount = parseFloat(document.getElementById('principalAmount').value);
+            let profitPercentage = parseFloat(document.getElementById('profitPercentage').value) / 100;
+
+            if (isNaN(principalAmount) || isNaN(profitPercentage) || profitPercentage <= 0) {
+                document.getElementById('profitResult').innerText = '请输入有效的数字';
+                return;
+            }
+
+            let profit = principalAmount * profitPercentage;
+            document.getElementById('profitResult').innerText = `计算的利润: ${profit.toFixed(2)}`;
+        }
     </script>
 </body>
 </html>
